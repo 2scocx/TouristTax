@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Tax Calculator</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            overflow-x: hidden; /* Disable horizontal scrolling */
+        }
+
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            z-index: -1;
+        }
+
+        .background1 {
+            background-image: url('venice.jpg'); /* Add your first Venice image file here */
+        }
+
+        .background2 {
+            background-image: url('venezia2.jpg'); /* Add your second Venice image file here */
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px; /* Add padding for sleek look */
+            padding-top: 80px; /* Increase top padding to prevent overlapping with title */
+            max-width: 90%; /* Set maximum width for better mobile layout */
+            margin: auto; /* Center the container horizontally */
+        }
+
+        .calculator {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            width: 100%; /* Ensure the calculator takes up the entire width of its container */
+            max-width: 500px; /* Set a maximum width to prevent the calculator from becoming too wide */
+        }
+
+        .calculator label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .calculator input {
+            width: calc(100% - 20px); /* Take up 100% width minus padding */
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .calculator button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .calculator button:hover {
+            background-color: #0056b3;
+        }
+
+        .green {
+            background-color: #28a745 !important; /* Override button color to green */
+        }
+
+        #result {
+            text-align: center;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        @media screen and (max-width: 600px) {
+            .container {
+                padding-top: 50px; /* Adjust top padding for smaller screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background background1"></div>
+    <div class="container">
+        
+        <div class="calculator">
+<h1 class="title">City Tax Calculator</h1> 
+            <label for="adults">Number of Adults (16+):</label>
+            <input type="number" id="adults" min="0" value="">
+            <br>
+            <label for="children10_15">Number of Minors (10-15):</label>
+            <input type="number" id="children10_15" min="0" value="">
+            <br>
+            <label for="children_lt_10">Number of Children (&lt;10):</label>
+            <input type="number" id="children_lt_10" min="0" value="">
+            <br>
+            <label for="nights">Number of Nights:</label>
+            <input type="number" id="nights" min="1" value="">
+            <br>
+            <div class="center-label">To calculate the amount of nights you can also enter your</div>
+
+            <label for="arrival">Arrival Date:</label>
+            <input type="date" id="arrival">
+            <br>
+            <label for="checkout"> And Check-out Date:</label>
+            <input type="date" id="checkout">
+            <br>
+            <button id="calculateButton">Calculate</button>
+            <br>
+            <div id="result"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("arrival").addEventListener("change", updateNumberOfNights);
+        document.getElementById("checkout").addEventListener("change", updateNumberOfNights);
+
+        function updateNumberOfNights() {
+            var arrivalDate = new Date(document.getElementById("arrival").value);
+            var checkoutDate = new Date(document.getElementById("checkout").value);
+
+            if (!isNaN(arrivalDate.getTime()) && !isNaN(checkoutDate.getTime())) {
+                var timeDifference = checkoutDate.getTime() - arrivalDate.getTime();
+                var totalNights = Math.ceil(timeDifference / (1000 * 3600 * 24));
+                document.getElementById("nights").value = totalNights;
+            }
+        }
+
+        document.getElementById("calculateButton").addEventListener("click", function() {
+            var button = document.getElementById("calculateButton");
+            button.classList.add("bobbing"); // Add bobbing animation class
+            button.classList.add("green"); // Add green color class
+
+            setTimeout(function() {
+                button.classList.remove("bobbing"); // Remove bobbing animation class after 0.8s
+                button.classList.remove("green"); // Remove green color class after 0.8s
+            }, 800);
+
+            calculate(); // Call calculate function
+        });
+
+        function calculate() {
+            var adults = document.getElementById("adults").value !== '' ? parseInt(document.getElementById("adults").value) : 0;
+            var children10_15 = document.getElementById("children10_15").value !== '' ? parseInt(document.getElementById("children10_15").value) : 0;
+            var children_lt_10 = document.getElementById("children_lt_10").value !== '' ? parseInt(document.getElementById("children_lt_10").value) : 0;
+            var nights = document.getElementById("nights").value !== '' ? parseInt(document.getElementById("nights").value) : 1;
+
+            var totalAdults = adults * 4;
+            var totalChildren10_15 = children10_15 * 2;
+            var totalChildren_lt_10 = 0; // Children < 10 are free
+
+            var total = totalAdults + totalChildren10_15 + totalChildren_lt_10;
+            var totalNights = 0;
+
+            // Calculate total nights based on arrival and checkout dates
+            var arrival = new Date(document.getElementById("arrival").value);
+            var checkout = new Date(document.getElementById("checkout").value);
+
+            if (!isNaN(arrival.getTime()) && !isNaN(checkout.getTime())) {
+                var timeDifference = checkout.getTime() - arrival.getTime();
+                totalNights = Math.ceil(timeDifference / (1000 * 3600 * 24));
+            } else {
+                totalNights = nights;
+            }
+ 
+        var nightsForTax = Math.min(totalNights, 5);
+
+   
+
+            var totalAmount = total * nightsForTax;
+
+            var result = document.getElementById("result");
+            result.innerHTML = "Total City Tax for " + totalNights + " nights: " + totalAmount + " euro. Enjoy your stay!!";
+        }
+    </script>
+    <script>
+        // Switch background images on button click
+        document.getElementById("calculateButton").addEventListener("click", function() {
+            document.querySelector('.background').classList.toggle('background1');
+            document.querySelector('.background').classList.toggle('background2');
+        });
+    </script>
+</body>
+</html>
+
+
